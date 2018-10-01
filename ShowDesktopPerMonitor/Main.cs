@@ -101,7 +101,7 @@ namespace ShowDesktopPerMonitor
                     return true;
 
                 var caption = GetWindowCaption(hWnd);
-                if (string.IsNullOrWhiteSpace(caption))
+                if (string.IsNullOrWhiteSpace(caption) || caption.Equals("Program Manager"))
                     return true;
 
                 var screen = Screen.FromHandle(hWnd);
@@ -112,7 +112,7 @@ namespace ShowDesktopPerMonitor
                 return true;
             }, IntPtr.Zero);
 
-            Task.Run(() => 
+            Task.Factory.StartNew(() => 
             {
                 if (!windowsHidden)
                 {
@@ -140,6 +140,21 @@ namespace ShowDesktopPerMonitor
             StringBuilder sb = new StringBuilder(len);
             len = NativeMethods.GetWindowText(hWnd, sb, len);
             return sb.ToString(0, len);
+        }
+
+        private void TrayIcon_Click(object sender, EventArgs e)
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            ShowInTaskbar = true;
+        }
+
+        private void Main_Resize(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                ShowInTaskbar = false;
+            }
         }
     }
 }
